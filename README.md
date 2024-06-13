@@ -1,2 +1,5 @@
-# 3D-multi-player
-Udemy course: https://www.udemy.com/course/create-a-3d-multi-player-game-using-threejs-and-socketio Learn to use the WebGL library THREE js, NODE.Js and Socket IO to create a 3D multi-player game.
+部署：
+在/3D-multi-player-main/nodeapps/blockland 路径下执行：
+  npm install express@4.15.2 --save
+  npm install socket.io@2.2.0 --save
+  node app.js
