@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8">
+		<title>login</title>
+		<link href="../images/favicon.ico" rel="icon" type="image/x-icon"/>
+		<link href="../images/favicon.ico" rel="bookmark" type="image/x-icon"/>
+		<!--引入样式文件-->
+		<link rel="stylesheet" type="text/css" href="../css/login.css "/>
+	</head>
+	
+	<body>
+		<div class="main">
+			<div class="maindiv1">
+				<form action="" method=""onsubmit="return login()">
+					<header>Login</header>
+					
+					<main>
+						<div class="user">
+							<span class="label" >Username</span>
+							<input type="text" name="username" placeholder="Please enter username" onkeyup="loginuser()" onblur="loginuser()">
+							<span class="focus-input"></span>
+						</div>
+	
+						<div class="pass">
+							<span class="label">Password</span>
+							<input type="password" name="pass" placeholder="Please enter password" onkeyup="loginpass()" onblur="loginpass()">
+							<span class="focus-input"></span>
+						</div>
+						<div class="yanzhengtxt">
+							
+						</div>
+						<div class="login">
+							<div class="login-bg-btn"></div>
+							<!--<input type="submit" class="login-btn" value="Login"></input>-->
+							<input type="button" class="login-btn" value="Login" onclick="login(event)">
+						</div>
+					</main>
+					
+					<footer>
+						<div class="zhuche">
+							<a href="#"onclick="fanzhuan(1)">Register now</a>
+						</div>
+						
+						<div class="return">
+							<a href="../index.html"><i data-feather="chevron-left"></i>以游客身份登录</a>
+						</div>
+					</footer>
+				</form>
+			</div>
+			<div class="maindiv2">
+				<form action="#" method="" id="reg" onsubmit="return reg()">
+					<header>Register</header>
+					
+					<main>
+						<div class="user">
+							<span class="label">Username</span>
+							<input type="text" name="username" placeholder="Please enter username" onkeyup="reguser()"onblur="reguser()">
+							<span class="focus-input"></span>
+						</div>
+						<div class="email">
+							<span class="label">Email</span>
+							<input type="text" name="email" placeholder="Please enter email" onkeyup="regemail()"onblur="regemail()">
+							<span class="focus-input"></span>
+						</div>
+						<div class="pass">
+							<span class="label">Password</span>
+							<input type="password" name="pass"  required placeholder="Please enter password" onkeyup="regpass1()"onblur="regpass1()">
+							<span class="focus-input"></span>
+						</div>
+				
+						<div class="yanzhengtxt">
+							
+						</div>
+						<div class="reg">
+							<div class="reg-bg-btn"></div>
+							<input type="submit" class="reg-btn" value="Register"></input>
+						</div>
+					</main>
+					
+					<footer>
+						<div class="return">
+							<a href="#" onclick="fanzhuan(2)"><i data-feather="chevron-left"></i>Back to login</a>
+						</div>
+					</footer>
+				</form>
+			</div>
+		</div>
+		
+		<!-- 引入feather icon文件 -->
+		<!-- <script src="js/feather.min.js"></script> -->
+		
+		<!--引入脚本文件-->
+		<script src = "http://code.jquery.com/jquery-latest.js">
+		</script>
+		<script src="../js/login.js" type="text/javascript" charset="utf-8"></script>
+	</body>
+</html>

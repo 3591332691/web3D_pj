@@ -2,12 +2,20 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const path = require('path');
 
 app.use(express.static('../../public_html/blockland/'));
 app.use(express.static('../../public_html/libs'));
 app.use(express.static('../../public_html/blockland/v3'));
 app.get('/',function(req, res) {
     res.sendFile(__dirname + '../../public_html/blockland/v3/index.html');
+});
+
+// 登录页面路由
+app.get('/login', function(req, res) {
+	const filePath = path.join(__dirname, '../../public_html/blockland/v3/login.html');
+	console.log(`Serving login file: ${filePath}`); // 调试信息
+	res.sendFile(filePath);
 });
 
 io.sockets.on('connection', function(socket){
