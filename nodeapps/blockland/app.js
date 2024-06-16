@@ -14,7 +14,6 @@ app.get('/',function(req, res) {
 // 登录页面路由
 app.get('/login', function(req, res) {
 	const filePath = path.join(__dirname, '../../public_html/blockland/v3/login.html');
-	console.log(`Serving login file: ${filePath}`); // 调试信息
 	res.sendFile(filePath);
 });
 
