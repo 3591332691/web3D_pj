@@ -15,6 +15,8 @@ class Game{
 		
 		this.container;
 		this.player;
+		this.guide; // 跟随用户的导游
+		this.assistant; // AI助手
 		this.cameras;
 		this.camera;
 		this.scene;
@@ -124,6 +126,8 @@ class Game{
 		this.player = new PlayerLocal(this);
 		
 		this.loadEnvironment(loader);
+		this.loadGuide(loader);
+		//this.loadAssitant();
 		
 		this.speechBubble = new SpeechBubble(this, "", 150);
 		this.speechBubble.mesh.position.set(0, 350, 0);
@@ -144,6 +148,10 @@ class Game{
 		}else{
 			window.addEventListener( 'mousedown', (event) => game.onMouseDown(event), false );	
 		}
+		this.guide.addEventListener('click', function() {
+			console.log("点击导游");
+			game.showChatBox("你好");
+		});
 		
 		window.addEventListener( 'resize', () => game.onWindowResize(), false );
 		// 添加空格键按下事件监听器  
@@ -193,9 +201,9 @@ class Game{
 			game.scene.background = textureCube;
 			
 			game.loadNextAnim(loader);
-			console.log("game.scene.position:",game.scene.position)
+			//console.log("game.scene.position:",game.scene.position)
 		})
-		console.log("game.scene.position:",game.scene.position)
+		//console.log("game.scene.position:",game.scene.position)
 	}
 
 	loadNextAnim(loader){
@@ -214,6 +222,44 @@ class Game{
 		});	
 	}
 	
+	showChatBox(message) {
+		const chatBox = document.createElement('div');
+		chatBox.classList.add('chat-box');
+		chatBox.textContent = message;
+		document.body.appendChild(chatBox);
+		console.log("showchatbox");
+		// 自动关闭聊天框
+		setTimeout(() => {
+			document.body.removeChild(chatBox);
+		}, 3000); // 3秒后自动关闭聊天框
+	}
+	
+	loadGuide(loader){
+		const game = this;
+		loader.load(`${this.assetsPath}fbx/guide/xiaoshizi.fbx`, function (model) {
+			// 设置导游模型的位置、旋转和缩放
+			model.position.set(0, 0, 0);
+			model.rotation.y = Math.PI * 1;
+			model.scale.set(10, 10, 10);
+			game.guide = model;
+			game.scene.add(model);
+			
+	
+			// 创建导游模型的碰撞体
+			const boundingBox = new THREE.Box3().setFromObject(model);
+			const boxGeometry = new THREE.BoxGeometry().setFromObject(boundingBox);
+			const boxMaterial = new THREE.MeshBasicMaterial({ visible: false });
+			const collider = new THREE.Mesh(boxGeometry, boxMaterial);
+			collider.userData = { name: 'guideCollider' };
+			collider.position.copy(model.position);
+			game.scene.add(collider);
+			game.remoteColliders.push(collider);
+			console.log("导游模型加载成功");
+	
+
+		});
+	}
+
 	playerControl(forward, turn){
 		turn = -turn;
 		
@@ -336,29 +382,29 @@ class Game{
 		this.remotePlayers.forEach(function(player){ player.update( dt ); });	
 	}
 	
-	onMouseDown( event ) {
-		if (this.remoteColliders===undefined || this.remoteColliders.length==0 || this.speechBubble===undefined || this.speechBubble.mesh===undefined) return;
-		
-		// calculate mouse position in normalized device coordinates
-		// (-1 to +1) for both components
+	onMouseDown(event) {
+		if (
+			this.remoteColliders === undefined ||
+			this.remoteColliders.length == 0 ||
+			this.speechBubble === undefined ||
+			this.speechBubble.mesh === undefined
+		)
+		return;
 		const mouse = new THREE.Vector2();
-		mouse.x = ( event.clientX / this.renderer.domElement.clientWidth ) * 2 - 1;
-		mouse.y = - ( event.clientY / this.renderer.domElement.clientHeight ) * 2 + 1;
-
+		mouse.x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1;
+		mouse.y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1;
 		const raycaster = new THREE.Raycaster();
-		raycaster.setFromCamera( mouse, this.camera );
-		
-		const intersects = raycaster.intersectObjects( this.remoteColliders );
+		raycaster.setFromCamera(mouse, this.camera);
+		const intersects = raycaster.intersectObjects(this.remoteColliders);
 		const chat = document.getElementById('chat');
-		
-		if (intersects.length>0){
+		if (intersects.length > 0) {
 			const object = intersects[0].object;
-			const players = this.remotePlayers.filter( function(player){
-				if (player.collider!==undefined && player.collider==object){
+			const players = this.remotePlayers.filter(function (player) {
+				if (player.collider !== undefined && player.collider == object) {
 					return true;
 				}
 			});
-			if (players.length>0){
+			if (players.length > 0) {
 				const player = players[0];
 				console.log(`onMouseDown: player ${player.id}`);
 				this.speechBubble.player = player;
@@ -367,20 +413,31 @@ class Game{
 				this.chatSocketId = player.id;
 				chat.style.bottom = '0px';
 				this.activeCamera = this.cameras.chat;
+			} else {
+				// Check if chat panel is visible
+				if (chat.style.bottom == '0px' && window.innerHeight - event.clientY > 40) {
+					console.log("onMouseDown: No player found");
+					if (this.speechBubble.mesh.parent !== null)
+						this.speechBubble.mesh.parent.remove(this.speechBubble.mesh);
+					delete this.speechBubble.player;
+					delete this.chatSocketId;
+					chat.style.bottom = '-50px';
+					this.activeCamera = this.cameras.back;
+				} else {
+					console.log("onMouseDown: typing");
+				}
 			}
-		}else{
-			//Is the chat panel visible?
-			if (chat.style.bottom=='0px' && (window.innerHeight - event.clientY)>40){
-				console.log("onMouseDown: No player found");
-				if (this.speechBubble.mesh.parent!==null) this.speechBubble.mesh.parent.remove(this.speechBubble.mesh);
-				delete this.speechBubble.player;
-				delete this.chatSocketId;
-				chat.style.bottom = '-50px';
-				this.activeCamera = this.cameras.back;
-			}else{
-				console.log("onMouseDown: typing");
+		} else {
+			// Check if the click is on the guide model
+			const guideIntersects = raycaster.intersectObjects([this.guide], true);
+			if (guideIntersects.length > 0) {
+				console.log("点击导游");
+				this.showChatBox("你好");
+			} else {
+				console.log("未检测到导游模型");
 			}
 		}
+		
 	}
 	
 	getRemotePlayerById(id){
@@ -424,6 +481,13 @@ class Game{
 				pos.y += 300;
 			}
 			this.camera.lookAt(pos);
+
+			// 更新导游模型的位置
+			if (this.guide !== undefined) {
+				const guideOffset = new THREE.Vector3(200, -30, 0); // 设置导游模型的偏移量
+    			const guidePosition = pos.clone().add(guideOffset);
+    			this.guide.position.copy(guidePosition);
+			}
 		}
 		
 		if (this.sun !== undefined){
