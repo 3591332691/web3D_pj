@@ -1,52 +1,29 @@
 //2
 //TODO:修改这里成为调用后端的
 async function getAIAnswer(question) {
-	const apiKey = 'sk-9f3778e2e3bc4840b95e8f4687c65ced';  // 替换为你的实际 API Key
-	const apiUrl = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation';
+    const baseUrl = 'http://localhost:8080/ai';
+    const url = `${baseUrl}?question=${encodeURIComponent(question)}`;
 
-	const headers = {
-		'Content-Type': 'application/json',
-		'Authorization': `Bearer ${apiKey}`
-	};
+    try {
+        const response = await fetch(url, {
+            method: 'GET', // 可以根据实际需要改为 POST，取决于后端接口要求
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-	const requestBody = {
-		model: 'qwen-turbo',  // 指定通义千问模型
-		input: {
-			messages: [
-				{ role: 'user', content: question }  // 用户输入的问题
-			]
-		},
-		parameters: {
-			result_format: 'message'  // 结果格式为 message
-		}
-	};
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
 
-	try {
-		const response = await fetch(apiUrl, {
-			method: 'POST',
-			headers: headers,
-			body: JSON.stringify(requestBody),
-			mode: 'cors'
-		});
-
-		if (!response.ok) {
-			console.error("response.status:",response.status)
-			throw new Error(`HTTP error! Status: ${response.status}`);
-		}
-
-		const responseData = await response.json();
-		if (responseData.status_code === 200) {
-			// 提取 AI 回答
-			const answer = responseData.data.result.messages[0].content;
-			return answer;
-		} else {
-			throw new Error(`API request failed! Code: ${responseData.status_code}, Message: ${responseData.message}`);
-		}
-	} catch (error) {
-		console.error('Error fetching data:', error);
-		return `Error fetching data: ${error.message}`;
-	}
+        const data = await response.json();
+        return data.output.text;
+    } catch (error) {
+        console.error('Error fetching AI answer:', error);
+        throw error;
+    }
 }
+
 class Game{
 	constructor(){
 		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -226,7 +203,7 @@ class Game{
 					})
 					.catch(error => {
 						console.error('获取 AI 回答时出错:', error);
-						this.showChatBox('AI 回答失败');
+						this.showChatBox('AI 回答失败：',error);
 					});
 			}
 		});
