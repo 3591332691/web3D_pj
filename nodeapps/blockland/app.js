@@ -4,6 +4,14 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const path = require('path');
 
+// 允许所有来源的请求访问
+app.use((req, res, next) => {
+	res.header('Access-Control-Allow-Origin', '*'); // 允许所有来源的请求访问，也可以指定特定的来源
+	res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // 允许的请求方法
+	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization'); // 允许的请求头
+	next();
+});
+
 app.use(express.static('../../public_html/blockland/'));
 app.use(express.static('../../public_html/libs'));
 app.use(express.static('../../public_html/blockland/v3'));

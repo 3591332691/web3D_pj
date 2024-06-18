@@ -1,4 +1,52 @@
 //2
+//TODO:修改这里成为调用后端的
+async function getAIAnswer(question) {
+	const apiKey = 'sk-9f3778e2e3bc4840b95e8f4687c65ced';  // 替换为你的实际 API Key
+	const apiUrl = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation';
+
+	const headers = {
+		'Content-Type': 'application/json',
+		'Authorization': `Bearer ${apiKey}`
+	};
+
+	const requestBody = {
+		model: 'qwen-turbo',  // 指定通义千问模型
+		input: {
+			messages: [
+				{ role: 'user', content: question }  // 用户输入的问题
+			]
+		},
+		parameters: {
+			result_format: 'message'  // 结果格式为 message
+		}
+	};
+
+	try {
+		const response = await fetch(apiUrl, {
+			method: 'POST',
+			headers: headers,
+			body: JSON.stringify(requestBody),
+			mode: 'cors'
+		});
+
+		if (!response.ok) {
+			console.error("response.status:",response.status)
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		}
+
+		const responseData = await response.json();
+		if (responseData.status_code === 200) {
+			// 提取 AI 回答
+			const answer = responseData.data.result.messages[0].content;
+			return answer;
+		} else {
+			throw new Error(`API request failed! Code: ${responseData.status_code}, Message: ${responseData.message}`);
+		}
+	} catch (error) {
+		console.error('Error fetching data:', error);
+		return `Error fetching data: ${error.message}`;
+	}
+}
 class Game{
 	constructor(){
 		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -149,9 +197,31 @@ class Game{
 		}else{
 			window.addEventListener( 'mousedown', (event) => game.onMouseDown(event), false );	
 		}
-		this.guide.addEventListener('click', function() {
+/*		this.guide.addEventListener('click', function() {
 			console.log("点击导游");
 			game.showChatBox("你好");
+		});*/
+		const AIsendButton = document.getElementById('AIsendButton');
+		// 添加点击事件监听器
+		AIsendButton.addEventListener('click', (event) => {
+			event.preventDefault(); // 阻止按钮的默认行为（如提交表单）
+			// 得到输入的内容
+			const inputField = document.getElementById('m1');
+			const inputValue = inputField.value.trim(); // 使用 trim() 方法去除首尾空白字符
+			// 判断输入内容是否为空
+			if (inputValue === '') {
+				this.showChatBox('你想说什么？'); // 输入内容为空时给出提示
+			} else {
+				// 不为空的话就返回 AI 回答的内容
+				getAIAnswer(inputValue)
+					.then(answer => {
+						this.showChatBox(answer);
+					})
+					.catch(error => {
+						console.error('获取 AI 回答时出错:', error);
+						this.showChatBox('AI 回答失败');
+					});
+			}
 		});
 		
 		window.addEventListener( 'resize', () => game.onWindowResize(), false );
@@ -554,6 +624,7 @@ class Game{
 		this.cameras = { front, back, wide, overhead, collect, chat };
 		this.activeCamera = this.cameras.back;	
 	}
+
 	
 	showMessage(msg, fontSize=20, onOK=null){
 		const txt = document.getElementById('message_text');
@@ -647,6 +718,7 @@ class Game{
 	
 		const intersects = raycaster.intersectObjects(this.remoteColliders);
 		const chat = document.getElementById('chat');
+		const chatWithAI = document.getElementById('chatWithAI');
 	
 		if (intersects.length > 0) {
 			const object = intersects[0].object;
@@ -668,10 +740,20 @@ class Game{
 			const guideIntersects = raycaster.intersectObjects([this.guide], true);
 	
 			if (guideIntersects.length > 0) {
+				//这里是点击了导游之后
 				console.log("Clicked on the guide model");
 				this.showChatBox("随身导游：你好");
+				chatWithAI.style.bottom = '0px';
 			} else {
 				console.log("Guide model not detected");
+				//如果此时点击到了空，就把聊天框下沉
+				if (chatWithAI.style.bottom === '0px' && window.innerHeight - event.clientY > 40) {
+					console.log("onMouseDown: close chat with AI");
+					chatWithAI.style.bottom = '-40px';
+					this.activeCamera = this.cameras.back;
+				} else {
+					console.log("onMouseDown: typing");
+				}
 			}
 	
 			// Check if chat panel is visible
@@ -682,11 +764,12 @@ class Game{
 				}
 				delete this.speechBubble.player;
 				delete this.chatSocketId;
-				chat.style.bottom = '-50px';
+				chat.style.bottom = '-40px';
 				this.activeCamera = this.cameras.back;
 			} else {
 				console.log("onMouseDown: typing");
 			}
+
 		}
 	}
 	
