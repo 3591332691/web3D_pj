@@ -74,6 +74,10 @@ class Game{
 
 		this.display1;
 		this.display2;
+		this.display3;
+		this.display4;
+		this.display5;
+		this.display6;
 		
 		this.remotePlayers = [];
 		this.remoteColliders = [];
@@ -331,6 +335,7 @@ class Game{
 			model.position.set(3511, 30, -4335);
 			//model.rotation.y = Math.PI * 1;
 			model.scale.set(1000, 1000, 1000);
+			game.display2 = model;
 			game.scene.add(model);
 			model.traverse( function ( child ) {
 				if ( child.isMesh ) {
@@ -368,6 +373,7 @@ class Game{
 			model.position.set(-1754, 30, -5708);
 			//model.rotation.y = Math.PI * 1;
 			model.scale.set(10, 10, 10);
+			game.display3 = model;
 			game.scene.add(model);
 			model.traverse( function ( child ) {
 				if ( child.isMesh ) {
@@ -405,6 +411,7 @@ class Game{
 			model.position.set(-4972, 30, -2622);
 			//model.rotation.y = Math.PI * 1;
 			model.scale.set(10, 10, 10);
+			game.display4 = model;
 			game.scene.add(model);
 			model.traverse( function ( child ) {
 				if ( child.isMesh ) {
@@ -442,6 +449,7 @@ class Game{
 			model.position.set(-5332, 30, 688);
 			//model.rotation.y = Math.PI * 1;
 			model.scale.set(300, 300, 300);
+			game.display5 = model;
 			game.scene.add(model);
 			model.traverse( function ( child ) {
 				if ( child.isMesh ) {
@@ -480,6 +488,7 @@ class Game{
 			model.position.set(-2031, 30, 5743);
 			//model.rotation.y = Math.PI * 1;
 			model.scale.set(10, 10, 10);
+			game.display6 = model;
 			game.scene.add(model);
 			model.traverse( function ( child ) {
 				if ( child.isMesh ) {
@@ -747,7 +756,7 @@ class Game{
 			if (guideIntersects.length > 0) {
 				//这里是点击了导游之后
 				console.log("Clicked on the guide model");
-				this.showChatBox("随身导游：你好");
+				this.showChatBox("随身导游：你好，我是随身导游，有什么问题可以问我哦！");
 				chatWithAI.style.bottom = '0px';
 			} else {
 				console.log("Guide model not detected");
@@ -764,9 +773,49 @@ class Game{
 			const display1Intersects = raycaster.intersectObjects([this.display1], true);
 			if(display1Intersects.length > 0) {
 				console.log("Clicked on the display1 model");
-				this.showChatBox("铜马：我是铜马");
+				this.showChatBox("在中国历史悠久的文化传统中，铜马是一种象征着力量和尊贵的艺术品。它们通常以铜为材料，精细地铸造而成，每一件铜马都是工匠们精心打造的杰作。这些铜马不仅仅是装饰品，它们背后还蕴含着深厚的文化内涵。在古代，铜马被用来作为贵族墓葬中的陪葬品，代表着对逝者的尊敬和祝福。它们还常常被视为吉祥物，象征着希望和兴旺。每一尊铜马都展现了古代工匠们卓越的铸造技艺和对细节的极致追求。从栩栩如生的姿态到精湛的表面雕刻，铜马无不展示出古代艺术家对形象和比例的精确把握。");
 			} else {
 				console.log("Display1 model not detected");
+			}
+
+			const display2Intersects = raycaster.intersectObjects([this.display2], true);
+			if(display2Intersects.length > 0) {
+				console.log("Clicked on the display2 model");
+				this.showChatBox("凤凰在中国传统文化中象征着吉祥、美好和荣耀。凤凰铜器是以这种神鸟为主题的艺术品，通常由精美的铜雕塑而成。每一件凤凰铜器都展示了古代工匠们的高超技艺和对美的追求。这些铜器不仅在艺术上令人赞叹，更反映了古代人们对神话传说和宇宙观念的理解。凤凰作为神话中的灵兽，被赋予了神圣的象征意义，常被用来装饰贵族的居所或作为贵重的礼物赠送。每一件凤凰铜器都通过精湛的铸造和精细的雕刻，展现了古代艺术家们对比例和细节的深刻把握。它们不仅是艺术品，更是文化的载体，传承着古代人们对美好生活和精神世界的追求。");
+			} else {
+				console.log("Display2 model not detected");
+			}
+
+			const display3Intersects = raycaster.intersectObjects([this.display3], true);
+			if(display3Intersects.length > 0) {
+				console.log("Clicked on the display3 model");
+				this.showChatBox("方鼎是古代中国的一种重要铜器，它结合了实用性与艺术性，通常用于烹饪和祭祀。这些鼎以其独特的方形设计著称，不仅在功能上体现了古代社会的文化与礼仪，也反映了当时铸造技术的高度发达。每一只方鼎都是由经验丰富的工匠们用精湛的铸造技艺制成。它们通常装饰着各种纹饰和图案，如凤凰、龙纹或神兽，这些装饰不仅美观，还承载着古代人们对神话和宗教信仰的理解。方鼎在古代社会中不仅作为日常生活中的重要器物，更是权力和地位的象征。它们常常被用于皇宫、贵族宅邸以及祭祀活动中，体现了社会秩序和文化传统的延续。");
+			} else {
+				console.log("Display3 model not detected");
+			}
+
+			const display4Intersects = raycaster.intersectObjects([this.display4], true);
+			if(display4Intersects.length > 0) {
+				console.log("Clicked on the display4 model");
+				this.showChatBox("升鼎是中国古代的一种重要青铜器，其形制独特，通常由鼎身、鼎耳和鼎腿组成。它们不仅在古代社会中扮演着烹饪和祭祀的重要角色，更是文化与宗教象征的重要载体。这些升鼎不仅在功能上体现了古代礼仪与生活方式，还展示了古代工匠们高超的铸造技艺。它们常常装饰着各种精美的纹饰和图案，如龙、凤、神兽等，这些装饰不仅美观，还反映了古代人们对神话和宗教信仰的崇敬。在古代社会中，升鼎不仅是贵族家庭中的重要器物，也是权力和地位的象征。它们常常被用于皇宫、贵族宅邸以及重大祭祀仪式中，承载着社会秩序和文化传统的重要使命。");
+			} else {
+				console.log("Display4 model not detected");
+			}
+
+			const display5Intersects = raycaster.intersectObjects([this.display5], true);
+			if(display5Intersects.length > 0) {
+				console.log("Clicked on the display4 model");
+				this.showChatBox("炉器是古代中国非常重要的铜器之一，它们不仅在日常生活中被用于取暖和烹饪，还在宗教仪式和宫廷礼仪中发挥着重要作用。炉器通常由青铜制成，设计精美，功能多样。这些古代炉器不仅展示了古代工匠们精湛的铸造技艺，还常常装饰着各种纹饰和图案，如龙、凤、云纹等，这些图案不仅美观，还蕴含着深刻的文化内涵和宗教象征。在古代社会中，炉器不仅是日常生活中的必需品，更是象征着家庭繁荣和权力的象征。它们常被视为贵族家庭的珍贵藏品，也常常被用于皇宫和宗庙中，作为祭祀仪式中的重要神器。");
+			} else {
+				console.log("Display5 model not detected");
+			}
+
+			const display6Intersects = raycaster.intersectObjects([this.display6], true);
+			if(display6Intersects.length > 0) {
+				console.log("Clicked on the display6 model");
+				this.showChatBox("青花瓷是中国古代著名的陶瓷品种，以其独特的青花装饰而闻名。这些瓷器通常是白色瓷胎，表面绘有青色的花卉、人物或景观图案，这些图案通过钴石在釉下绘制而成。青花瓷器以其精美的工艺和深厚的文化底蕴而备受推崇。它们不仅在中国，还在世界各地被视为艺术珍品。青花瓷既是日常生活中的实用品，也是贵族收藏和文化交流的重要载体。每一件青花瓷都是陶瓷艺术家们精心设计和制作的结晶。从唐宋时期的初步发展到元明清时期的鼎盛，青花瓷在中国陶瓷史上占据着重要地位，反映了不同历史时期的审美趣味和制作技艺。");
+			} else {
+				console.log("Display6 model not detected");
 			}
 	
 			// Check if chat panel is visible
