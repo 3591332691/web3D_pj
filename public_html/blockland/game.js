@@ -71,6 +71,9 @@ class Game{
 		this.renderer;
 		this.animations = {};
 		this.assetsPath = 'assets/';
+
+		this.display1;
+		this.display2;
 		
 		this.remotePlayers = [];
 		this.remoteColliders = [];
@@ -282,6 +285,7 @@ class Game{
 	 * @param loader
 	 */
 	loadDisplay(loader){
+		const textureLoader = new THREE.TextureLoader();
 		const game = this;
 		//加载铜马
 		loader.load(`${this.assetsPath}fbx/display/tongma/tongma.fbx`, function(model){
@@ -289,6 +293,7 @@ class Game{
 			model.position.set(5185, 30, -2123);
 			//model.rotation.y = Math.PI * 1;
 			model.scale.set(6, 6, 6);
+			game.display1 = model;
 			game.scene.add(model);
 			model.traverse( function ( child ) {
 				if ( child.isMesh ) {
@@ -754,6 +759,14 @@ class Game{
 				} else {
 					console.log("onMouseDown: typing");
 				}
+			}
+
+			const display1Intersects = raycaster.intersectObjects([this.display1], true);
+			if(display1Intersects.length > 0) {
+				console.log("Clicked on the display1 model");
+				this.showChatBox("铜马：我是铜马");
+			} else {
+				console.log("Display1 model not detected");
 			}
 	
 			// Check if chat panel is visible
