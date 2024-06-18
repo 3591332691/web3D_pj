@@ -41,6 +41,7 @@ class Game{
 		this.container;
 		this.player;
 		this.guide; // 跟随用户的导游
+		this.examiner; // 考官
 		this.assistant; // AI助手
 		this.cameras;
 		this.camera;
@@ -60,6 +61,30 @@ class Game{
 		this.remoteColliders = [];
 		this.initialisingPlayers = [];
 		this.remoteData = [];
+
+		// 考试问题暂时写死
+		this.questions = [
+			{
+				question: '1.万年的稻作文化系统位于（）省。',
+				options: ['A.江西', 'B.云南', 'C.浙江'],
+				answer: '1'
+			},
+			{
+				question: '2.高句丽古墓群属于哪个国家的世界文化遗产',
+				options: ['A.韩国', 'B.朝鲜', 'C.中国'],
+				answer: '2'
+			},
+			{
+				question: '3.耳杯这种形制的玛瑙器出现于什么时代',
+				options: ['A.汉代', 'B.三国', 'C.魏晋'],
+				answer: '1'
+			},
+			{
+				question: '4.号称“青铜之冠”，体现中国古代铜器制造最高制造水平的是',
+				options: ['A.铜车马', 'B.青铜剑', 'C.寺工铜矛'],
+				answer: '1'
+			}
+		];
 		
 		this.messages = { 
 			text:[ 
@@ -243,6 +268,7 @@ class Game{
 		this.loadGuide(loader);
 		//this.loadAssitant();
 		this.loadDisplay(loader);
+		this.loadExaminer(loader); // 创建考官
 		
 		this.speechBubble = new SpeechBubble(this, "", 150);
 		this.speechBubble.mesh.position.set(0, 350, 0);
@@ -600,7 +626,56 @@ class Game{
 			}
 		});	
 	}
-	
+
+	loadExaminer(loader) {
+		const textureLoader = new THREE.TextureLoader();
+		const game = this;
+
+		// 加载NPC模型
+		loader.load(`${this.assetsPath}fbx/npc/BB8.fbx`, function(model) {
+			// 设置模型的位置、旋转和缩放
+			model.position.set(2500, 100, 500);
+			model.scale.set(3, 3, 3);
+
+			game.examiner = model;
+			game.scene.add(model);
+
+			model.traverse(function(child) {
+				if (child.isMesh) {
+					if (child.name.startsWith("proxy")) {
+						game.colliders.push(child);
+						child.material.visible = false;
+					} else {
+						child.castShadow = true;
+						child.receiveShadow = true;
+						// 加载模型的贴图
+						if (child.material.map === null) { // 只加载未加载过贴图的材质
+							const texturePath = `${game.assetsPath}fbx/npc/textures/${child.name}.png`;
+							textureLoader.load(texturePath, function(texture) {
+								child.material.map = texture;
+								child.material.needsUpdate = true;
+							});
+						}
+					}
+				}
+			});
+
+			// 碰撞体
+			const boundingBox = new THREE.Box3().setFromObject(model);
+			const boxGeometry = new THREE.Box3().setFromObject(boundingBox);
+			const boxMaterial = new THREE.MeshBasicMaterial({ visible: false });
+			const collider = new THREE.Mesh(boxGeometry, boxMaterial);
+			collider.userData = { name: 'npcCollider' };
+			collider.position.copy(model.position);
+			game.scene.add(collider);
+			game.remoteColliders.push(collider);
+
+			console.log("考官加载成功");
+		});
+	}
+
+
+
 	showChatBox(message) {
 		const chatContainer = document.createElement('div');
 		chatContainer.id = 'chat-box';
@@ -626,7 +701,164 @@ class Game{
 			chatContainer.remove();
 		}, 5000);
 	}
-	
+
+	showExamBox(questions) {
+		// 创建对话框容器
+		const examContainer = document.createElement('div');
+		examContainer.id = 'exam-box';
+		examContainer.style.position = 'absolute';
+		examContainer.style.top = '50%';
+		examContainer.style.left = '50%';
+		examContainer.style.transform = 'translate(-50%, -50%)';  // 垂直和水平居中
+		examContainer.style.padding = '20px';
+		examContainer.style.background = 'rgba(255, 255, 255, 0.95)';
+		examContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+		examContainer.style.color = 'black';
+		examContainer.style.borderRadius = '10px';
+		examContainer.style.boxShadow = '0px 0px 20px rgba(0, 0, 0, 0.5)';
+		examContainer.style.width = '800px';
+		examContainer.style.maxHeight = '80%';
+		examContainer.style.overflowY = 'auto';
+		examContainer.style.zIndex = '1000';
+		examContainer.style.fontSize = '20px';
+
+		// 标题
+		const title = document.createElement('h2');
+		title.textContent = '在线测试';
+		title.style.textAlign = 'center';
+		title.style.marginBottom = '20px';
+		examContainer.appendChild(title);
+
+		// 创建问题表单
+		const form = document.createElement('form');
+		form.id = 'exam-form';
+		form.style.background = 'white';
+		questions.forEach((q, i) => {
+			const questionContainer = document.createElement('div');
+			questionContainer.style.marginBottom = '30px';
+			questionContainer.style.background = 'white';
+			questionContainer.style.verticalAlign = 'middle';
+
+			const questionLabel = document.createElement('label');
+			questionLabel.textContent = q.question;
+			questionLabel.style.display = 'block';
+			questionLabel.style.marginBottom = '5px';
+			questionLabel.style.fontWeight = 'bold';
+			questionLabel.style.background = 'white';
+			questionLabel.style.backgroundColor = 'white';
+
+			questionContainer.appendChild(questionLabel);
+
+			q.options.forEach((option, j) => {
+
+				const optionLabel = document.createElement('label');
+				optionLabel.style.background = 'white';
+				optionLabel.style.display = 'inline-block';
+				optionLabel.style.background = 'white';
+
+				const optionInput = document.createElement('input');
+				optionInput.type = 'radio';
+				optionInput.name = `question-${i}`;
+				optionInput.value = j+1;
+				optionInput.style.display = 'inline-block';
+				optionInput.style.background = 'white';
+				optionInput.style.backgroundColor = 'white';
+				optionInput.style.width = '10%';
+				optionInput.style.marginLeft = '5px';
+
+				optionLabel.appendChild(optionInput);
+				optionLabel.appendChild(document.createTextNode(option));
+				questionContainer.appendChild(optionLabel);
+			});
+
+			form.appendChild(questionContainer);
+		});
+
+		// 提交按钮
+		const submitButton = document.createElement('button');
+		submitButton.type = 'button';
+		submitButton.textContent = '提交答案';
+		submitButton.style.marginTop = '20px';
+		submitButton.style.padding = '10px';
+		submitButton.style.width = '100%';
+		submitButton.style.backgroundColor = '#4CAF50';
+		submitButton.style.color = 'white';
+		submitButton.style.border = 'none';
+		submitButton.style.borderRadius = '5px';
+		submitButton.style.cursor = 'pointer';
+		submitButton.onclick = () => this.submitExam(questions);
+
+		submitButton.onmouseover = () => submitButton.style.backgroundColor = '#45a049';
+		submitButton.onmouseout = () => submitButton.style.backgroundColor = '#4CAF50';
+
+		form.appendChild(submitButton);
+		examContainer.appendChild(form);
+
+		// 关闭按钮
+		const closeButton = document.createElement('span');
+		closeButton.textContent = '×';
+		closeButton.style.position = 'absolute';
+		closeButton.style.top = '10px';
+		closeButton.style.right = '10px';
+		closeButton.style.cursor = 'pointer';
+		closeButton.style.fontSize = '20px';
+		closeButton.onclick = () => examContainer.remove();
+
+		closeButton.onmouseover = () => closeButton.style.color = 'red';
+		closeButton.onmouseout = () => closeButton.style.color = 'black';
+
+		examContainer.appendChild(closeButton);
+
+		// 检查是否已经有考试对话框存在，如果有则移除
+		const existingExamBox = document.getElementById('exam-box');
+		if (existingExamBox) {
+			existingExamBox.remove();
+		}
+
+		document.body.appendChild(examContainer);
+	}
+
+	submitExam(questions) {
+		const form = document.getElementById('exam-form');
+		const formData = new FormData(form);
+
+		let correctCount = 0;
+		let feedback = '';
+
+		questions.forEach((q, i) => {
+			const userAnswer = formData.get(`question-${i}`);
+			q.userAnswer = userAnswer; // 将用户选择的答案保存到题目对象中
+			console.log(userAnswer);
+
+			// 检查用户答案是否正确
+			if (userAnswer === q.answer) {
+				correctCount++;
+				feedback += `题目 ${i + 1}: 正确\n`;
+			} else {
+				feedback += `题目 ${i + 1}: 错误，正确答案是 ${q.options[q.answer]}\n`
+			}
+		});
+
+		// 计算得分或显示结果
+		const score = (correctCount / questions.length) * 100;
+		feedback += `\n您的得分为：${score.toFixed(2)}%`;
+
+		alert(feedback);
+
+		// 可以选择性地将结果显示在页面的某个区域，或者做其他交互
+
+		// 移除考试对话框
+		const examBox = document.getElementById('exam-box');
+		if (examBox) {
+			examBox.remove();
+		}
+	}
+
+
+
+
+
+
 	loadGuide(loader){
 		const game = this;
 		loader.load(`${this.assetsPath}fbx/guide/xiaoshizi.fbx`, function (model) {
@@ -815,6 +1047,7 @@ class Game{
 			} 
 		} else {
 			const guideIntersects = raycaster.intersectObjects([this.guide], true);
+			const examinerIntersects = raycaster.intersectObjects([this.examiner], true);
 	
 			if (guideIntersects.length > 0) {
 				//这里是点击了导游之后
@@ -832,6 +1065,17 @@ class Game{
 					console.log("onMouseDown: typing");
 				}
 			}
+
+			if (examinerIntersects.length > 0) { // 点击考官
+				console.log("Clicked on the guide model");
+				this.showChatBox("考官：开始答题！");
+				this.showExamBox(this.questions);
+				chatWithAI.style.bottom = '0px';
+			} else {
+				console.log("Guide model not detected");
+			}
+
+
 
 			const display1Intersects = raycaster.intersectObjects([this.display1], true);
 			if(display1Intersects.length > 0) {
