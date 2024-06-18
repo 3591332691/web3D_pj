@@ -18,11 +18,18 @@
 		<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Kavivanar" rel="stylesheet">
 		<style>
 			body {
+				position: relative;
 				font-family: Monospace;
 				background-color: #000;
 				color: #fff;
 				margin: 0px;
 				overflow: hidden;
+			}
+
+			#modelSelectorContainer {
+				position: absolute;
+				top: 0;
+				left: 0;
 			}
 			#message{
 				position:absolute;
@@ -76,6 +83,18 @@
 	</head>
 
 	<body>
+		<div id="modelSelectorContainer">
+			<select id="modelSelector">
+				<option value="BeachBabe">Beach Babe</option>
+				<option value="BusinessMan">Business Man</option>
+				<option value="Doctor">Doctor</option>
+				<option value="FireFighter">FireFighter</option>
+				<option value="Housewife">Housewife</option>
+				<option value="Policeman">Policeman</option>
+				<!-- 添加其他模型选项 -->
+			</select>
+		</div>
+
 		<div id="message">
 			<p id="message_text"></p>
 			<button id="message_ok">OK</button>
