@@ -105,6 +105,87 @@ class Game{
 			console.error(JSON.stringify(error));
 		}
 	}
+
+		  // 玩家模型创建函数
+		  createPlayer() {
+			const modelSelector = document.getElementById('modelSelector');
+			const selectedModel = modelSelector.options[modelSelector.selectedIndex].value;
+		
+			this.player = new PlayerLocal(this, selectedModel);
+		  }
+		
+		  changePlayerModel(model) {
+			if (this.player !== undefined) {
+				console.log("Old player object:", this.player.object); // 打印旧模型对象
+				this.scene.remove(this.player.object);
+		
+				// 更新当前角色的外貌
+				this.player.model = model;
+		
+				// 重新加载新外貌的模型
+				this.loadPlayerModel();
+			}
+		}
+		
+		loadPlayerModel() {
+			const player = this.player;
+			const loader = new THREE.FBXLoader();
+			const game = this;
+		
+			loader.load(`${game.assetsPath}fbx/people/${player.model}.fbx`, function (object) {
+				object.mixer = new THREE.AnimationMixer(object);
+				player.root = object;
+				player.mixer = object.mixer;
+		
+				object.name = "Person";
+		
+				object.traverse(function (child) {
+					if (child.isMesh) {
+						child.castShadow = true;
+						child.receiveShadow = true;
+					}
+				});
+		
+				const textureLoader = new THREE.TextureLoader();
+		
+				textureLoader.load(`${game.assetsPath}images/SimplePeople_${player.model}_${player.colour}.png`, function (texture) {
+					object.traverse(function (child) {
+						if (child.isMesh) {
+							child.material.map = texture;
+						}
+					});
+				});
+		
+				player.object = new THREE.Object3D();
+				player.object.position.set(3122, 0, -173);
+				player.object.rotation.set(0, 2.6, 0);
+		
+				player.object.add(object);
+				if (player.deleted === undefined) game.scene.add(player.object);
+		
+				if (player.local) {
+					game.createCameras();
+					game.sun.target = game.player.object;
+					game.animations.Idle = object.animations[0];
+					if (player.initSocket !== undefined) player.initSocket();
+				} else {
+					const geometry = new THREE.BoxGeometry(100, 300, 100);
+					const material = new THREE.MeshBasicMaterial({ visible: false });
+					const box = new THREE.Mesh(geometry, material);
+					box.name = "Collider";
+					box.position.set(0, 150, 0);
+					player.object.add(box);
+					player.collider = box;
+					player.object.userData.id = player.id;
+					player.object.userData.remotePlayer = true;
+					const players = game.initialisingPlayers.splice(game.initialisingPlayers.indexOf(this), 1);
+					game.remotePlayers.push(players[0]);
+				}
+		
+				if (game.animations.Idle !== undefined) player.action = "Idle";
+			});
+		}
+		
 	
 	initSfx(){
 		this.sfx = {};
@@ -155,7 +236,8 @@ class Game{
 		const loader = new THREE.FBXLoader();
 		const game = this;
 		
-		this.player = new PlayerLocal(this);
+		//this.player = new PlayerLocal(this);
+		this.createPlayer(); // 创建玩家
 		
 		this.loadEnvironment(loader);
 		this.loadGuide(loader);
@@ -207,7 +289,11 @@ class Game{
 					});
 			}
 		});
-		
+				  // 在初始化函数中添加以下代码
+				  const modelSelector = document.getElementById('modelSelector');
+				  modelSelector.addEventListener('change', function(event) {
+					game.changePlayerModel(event.target.value);
+				  });
 		window.addEventListener( 'resize', () => game.onWindowResize(), false );
 		// 添加空格键按下事件监听器  
 		document.addEventListener('keydown', (event) => {
