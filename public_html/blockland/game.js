@@ -223,15 +223,29 @@ class Game{
 	}
 	
 	showChatBox(message) {
-		const chatBox = document.createElement('div');
-		chatBox.classList.add('chat-box');
-		chatBox.textContent = message;
-		document.body.appendChild(chatBox);
-		console.log("showchatbox");
-		// 自动关闭聊天框
+		const chatContainer = document.createElement('div');
+		chatContainer.id = 'chat-box';
+		chatContainer.style.position = 'absolute';
+		chatContainer.style.bottom = '10px';
+		chatContainer.style.left = '10px';
+		chatContainer.style.padding = '10px';
+		chatContainer.style.background = 'rgba(0, 0, 0, 0.7)';
+		chatContainer.style.color = 'white';
+		chatContainer.style.borderRadius = '5px';
+		chatContainer.textContent = message;
+	
+		// Check if chat box already exists, remove it before adding a new one
+		const existingChatBox = document.getElementById('chat-box');
+		if (existingChatBox) {
+			existingChatBox.remove();
+		}
+	
+		document.body.appendChild(chatContainer);
+	
+		// Automatically remove the chat box after a few seconds
 		setTimeout(() => {
-			document.body.removeChild(chatBox);
-		}, 3000); // 3秒后自动关闭聊天框
+			chatContainer.remove();
+		}, 5000);
 	}
 	
 	loadGuide(loader){
@@ -388,22 +402,26 @@ class Game{
 			this.remoteColliders.length == 0 ||
 			this.speechBubble === undefined ||
 			this.speechBubble.mesh === undefined
-		)
-		return;
+		) {
+			return;
+		}
+	
 		const mouse = new THREE.Vector2();
 		mouse.x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1;
 		mouse.y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1;
+	
 		const raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera(mouse, this.camera);
+	
 		const intersects = raycaster.intersectObjects(this.remoteColliders);
 		const chat = document.getElementById('chat');
+	
 		if (intersects.length > 0) {
 			const object = intersects[0].object;
 			const players = this.remotePlayers.filter(function (player) {
-				if (player.collider !== undefined && player.collider == object) {
-					return true;
-				}
+				return player.collider !== undefined && player.collider === object;
 			});
+	
 			if (players.length > 0) {
 				const player = players[0];
 				console.log(`onMouseDown: player ${player.id}`);
@@ -413,31 +431,31 @@ class Game{
 				this.chatSocketId = player.id;
 				chat.style.bottom = '0px';
 				this.activeCamera = this.cameras.chat;
-			} else {
-				// Check if chat panel is visible
-				if (chat.style.bottom == '0px' && window.innerHeight - event.clientY > 40) {
-					console.log("onMouseDown: No player found");
-					if (this.speechBubble.mesh.parent !== null)
-						this.speechBubble.mesh.parent.remove(this.speechBubble.mesh);
-					delete this.speechBubble.player;
-					delete this.chatSocketId;
-					chat.style.bottom = '-50px';
-					this.activeCamera = this.cameras.back;
-				} else {
-					console.log("onMouseDown: typing");
-				}
-			}
+			} 
 		} else {
-			// Check if the click is on the guide model
 			const guideIntersects = raycaster.intersectObjects([this.guide], true);
+	
 			if (guideIntersects.length > 0) {
-				console.log("点击导游");
-				this.showChatBox("你好");
+				console.log("Clicked on the guide model");
+				this.showChatBox("随身导游：你好");
 			} else {
-				console.log("未检测到导游模型");
+				console.log("Guide model not detected");
+			}
+	
+			// Check if chat panel is visible
+			if (chat.style.bottom === '0px' && window.innerHeight - event.clientY > 40) {
+				console.log("onMouseDown: No player found");
+				if (this.speechBubble.mesh.parent !== null) {
+					this.speechBubble.mesh.parent.remove(this.speechBubble.mesh);
+				}
+				delete this.speechBubble.player;
+				delete this.chatSocketId;
+				chat.style.bottom = '-50px';
+				this.activeCamera = this.cameras.back;
+			} else {
+				console.log("onMouseDown: typing");
 			}
 		}
-		
 	}
 	
 	getRemotePlayerById(id){
