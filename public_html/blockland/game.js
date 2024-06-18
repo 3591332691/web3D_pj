@@ -128,6 +128,7 @@ class Game{
 		this.loadEnvironment(loader);
 		this.loadGuide(loader);
 		//this.loadAssitant();
+		this.loadDisplay(loader);
 		
 		this.speechBubble = new SpeechBubble(this, "", 150);
 		this.speechBubble.mesh.position.set(0, 350, 0);
@@ -204,6 +205,239 @@ class Game{
 			//console.log("game.scene.position:",game.scene.position)
 		})
 		//console.log("game.scene.position:",game.scene.position)
+	}
+
+	/**
+	 * 用来加载展品
+	 * @param loader
+	 */
+	loadDisplay(loader){
+		const game = this;
+		//加载铜马
+		loader.load(`${this.assetsPath}fbx/display/tongma/tongma.fbx`, function(model){
+			// 设置模型的位置、旋转和缩放
+			model.position.set(5185, 30, -2123);
+			//model.rotation.y = Math.PI * 1;
+			model.scale.set(6, 6, 6);
+			game.scene.add(model);
+			model.traverse( function ( child ) {
+				if ( child.isMesh ) {
+					if (child.name.startsWith("proxy")){
+						game.colliders.push(child);
+						child.material.visible = false;
+					}else{
+						child.castShadow = true;
+						child.receiveShadow = true;
+						// 加载模型的贴图
+						if (child.material.map === null) { // 只加载未加载过贴图的材质
+							const texturePath = `${game.assetsPath}fbx/display/tongma/texture/${child.name}.png`;
+							textureLoader.load(texturePath, function(texture) {
+								child.material.map = texture;
+								child.material.needsUpdate = true;
+							});
+						}
+					}
+				}
+			} );
+			// 创建模型的碰撞体
+			const boundingBox = new THREE.Box3().setFromObject(model);
+			const boxGeometry = new THREE.BoxGeometry().setFromObject(boundingBox);
+			const boxMaterial = new THREE.MeshBasicMaterial({ visible: false });
+			const collider = new THREE.Mesh(boxGeometry, boxMaterial);
+			collider.userData = { name: 'display1Collider' };
+			collider.position.copy(model.position);
+			game.scene.add(collider);
+			game.remoteColliders.push(collider);
+			console.log("模型1号加载成功");
+		})
+		//加载觥
+		//TODO：这个里面没有
+		loader.load(`${this.assetsPath}fbx/display/gong/gong.fbx`, function(model){
+			// 设置模型的位置、旋转和缩放
+			model.position.set(3511, 30, -4335);
+			//model.rotation.y = Math.PI * 1;
+			model.scale.set(10, 10, 10);
+			game.scene.add(model);
+			model.traverse( function ( child ) {
+				if ( child.isMesh ) {
+					if (child.name.startsWith("proxy")){
+						game.colliders.push(child);
+						child.material.visible = false;
+					}else{
+						child.castShadow = true;
+						child.receiveShadow = true;
+						// 加载模型的贴图
+						if (child.material.map === null) { // 只加载未加载过贴图的材质
+							const texturePath = `${game.assetsPath}fbx/display/gong/texture/${child.name}.png`;
+							textureLoader.load(texturePath, function(texture) {
+								child.material.map = texture;
+								child.material.needsUpdate = true;
+							});
+						}
+					}
+				}
+			} );
+			// 创建模型的碰撞体
+			const boundingBox = new THREE.Box3().setFromObject(model);
+			const boxGeometry = new THREE.BoxGeometry().setFromObject(boundingBox);
+			const boxMaterial = new THREE.MeshBasicMaterial({ visible: false });
+			const collider = new THREE.Mesh(boxGeometry, boxMaterial);
+			collider.userData = { name: 'display2Collider' };
+			collider.position.copy(model.position);
+			game.scene.add(collider);
+			game.remoteColliders.push(collider);
+			console.log("模型2号加载成功");
+		})
+		//加载方鼎
+		loader.load(`${this.assetsPath}fbx/display/fangding/fangding.fbx`, function(model){
+			// 设置模型的位置、旋转和缩放
+			model.position.set(-1754, 30, -5708);
+			//model.rotation.y = Math.PI * 1;
+			model.scale.set(10, 10, 10);
+			game.scene.add(model);
+			model.traverse( function ( child ) {
+				if ( child.isMesh ) {
+					if (child.name.startsWith("proxy")){
+						game.colliders.push(child);
+						child.material.visible = false;
+					}else{
+						child.castShadow = true;
+						child.receiveShadow = true;
+						// 加载模型的贴图
+						if (child.material.map === null) { // 只加载未加载过贴图的材质
+							const texturePath = `${game.assetsPath}fbx/display/fangding/texture/${child.name}.png`;
+							textureLoader.load(texturePath, function(texture) {
+								child.material.map = texture;
+								child.material.needsUpdate = true;
+							});
+						}
+					}
+				}
+			} );
+			// 创建模型的碰撞体
+			const boundingBox = new THREE.Box3().setFromObject(model);
+			const boxGeometry = new THREE.BoxGeometry().setFromObject(boundingBox);
+			const boxMaterial = new THREE.MeshBasicMaterial({ visible: false });
+			const collider = new THREE.Mesh(boxGeometry, boxMaterial);
+			collider.userData = { name: 'display3Collider' };
+			collider.position.copy(model.position);
+			game.scene.add(collider);
+			game.remoteColliders.push(collider);
+			console.log("模型3号加载成功");
+		})
+		//加载升鼎
+		loader.load(`${this.assetsPath}fbx/display/ding/ding.fbx`, function(model){
+			// 设置模型的位置、旋转和缩放
+			model.position.set(-4972, 30, -2622);
+			//model.rotation.y = Math.PI * 1;
+			model.scale.set(10, 10, 10);
+			game.scene.add(model);
+			model.traverse( function ( child ) {
+				if ( child.isMesh ) {
+					if (child.name.startsWith("proxy")){
+						game.colliders.push(child);
+						child.material.visible = false;
+					}else{
+						child.castShadow = true;
+						child.receiveShadow = true;
+						// 加载模型的贴图
+						if (child.material.map === null) { // 只加载未加载过贴图的材质
+							const texturePath = `${game.assetsPath}fbx/display/ding/texture/${child.name}.png`;
+							textureLoader.load(texturePath, function(texture) {
+								child.material.map = texture;
+								child.material.needsUpdate = true;
+							});
+						}
+					}
+				}
+			} );
+			// 创建模型的碰撞体
+			const boundingBox = new THREE.Box3().setFromObject(model);
+			const boxGeometry = new THREE.BoxGeometry().setFromObject(boundingBox);
+			const boxMaterial = new THREE.MeshBasicMaterial({ visible: false });
+			const collider = new THREE.Mesh(boxGeometry, boxMaterial);
+			collider.userData = { name: 'display4Collider' };
+			collider.position.copy(model.position);
+			game.scene.add(collider);
+			game.remoteColliders.push(collider);
+			console.log("模型4号加载成功");
+		})
+		//凤凰
+		//TODO：这个里面没有
+		loader.load(`${this.assetsPath}fbx/display/fenghuang/model.fbx`, function(model){
+			// 设置模型的位置、旋转和缩放
+			model.position.set(-5332, 30, 688);
+			//model.rotation.y = Math.PI * 1;
+			model.scale.set(10, 10, 10);
+			game.scene.add(model);
+			model.traverse( function ( child ) {
+				if ( child.isMesh ) {
+					if (child.name.startsWith("proxy")){
+						game.colliders.push(child);
+						child.material.visible = false;
+					}else{
+						child.castShadow = true;
+						child.receiveShadow = true;
+						// 加载模型的贴图
+						if (child.material.map === null) { // 只加载未加载过贴图的材质
+							const texturePath = `${game.assetsPath}fbx/display/fenghaung/textures/${child.name}.png`;
+							textureLoader.load(texturePath, function(texture) {
+								child.material.map = texture;
+								child.material.needsUpdate = true;
+							});
+						}
+					}
+				}
+			} );
+			// 创建模型的碰撞体
+			const boundingBox = new THREE.Box3().setFromObject(model);
+			const boxGeometry = new THREE.BoxGeometry().setFromObject(boundingBox);
+			const boxMaterial = new THREE.MeshBasicMaterial({ visible: false });
+			const collider = new THREE.Mesh(boxGeometry, boxMaterial);
+			collider.userData = { name: 'display5Collider' };
+			collider.position.copy(model.position);
+			game.scene.add(collider);
+			game.remoteColliders.push(collider);
+			console.log("模型5号加载成功");
+		})
+		//加载青花瓷
+		//TODO：这个没有材质
+		loader.load(`${this.assetsPath}fbx/display/qinghuaci/ping.fbx`, function(model){
+			// 设置模型的位置、旋转和缩放
+			model.position.set(-2031, 30, 5743);
+			//model.rotation.y = Math.PI * 1;
+			model.scale.set(10, 10, 10);
+			game.scene.add(model);
+			model.traverse( function ( child ) {
+				if ( child.isMesh ) {
+					if (child.name.startsWith("proxy")){
+						game.colliders.push(child);
+						child.material.visible = false;
+					}else{
+						child.castShadow = true;
+						child.receiveShadow = true;
+						// 加载模型的贴图
+						if (child.material.map === null) { // 只加载未加载过贴图的材质
+							const texturePath = `${game.assetsPath}fbx/display/qinghuaci/${child.name}.png`;
+							textureLoader.load(texturePath, function(texture) {
+								child.material.map = texture;
+								child.material.needsUpdate = true;
+							});
+						}
+					}
+				}
+			} );
+			// 创建模型的碰撞体
+			const boundingBox = new THREE.Box3().setFromObject(model);
+			const boxGeometry = new THREE.BoxGeometry().setFromObject(boundingBox);
+			const boxMaterial = new THREE.MeshBasicMaterial({ visible: false });
+			const collider = new THREE.Mesh(boxGeometry, boxMaterial);
+			collider.userData = { name: 'display6Collider' };
+			collider.position.copy(model.position);
+			game.scene.add(collider);
+			game.remoteColliders.push(collider);
+			console.log("模型6号加载成功");
+		})
 	}
 
 	loadNextAnim(loader){
