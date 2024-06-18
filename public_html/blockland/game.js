@@ -250,13 +250,12 @@ class Game{
 			game.remoteColliders.push(collider);
 			console.log("模型1号加载成功");
 		})
-		//加载觥
-		//TODO：这个里面没有
-		loader.load(`${this.assetsPath}fbx/display/gong/gong.fbx`, function(model){
+		//加载凤凰
+		loader.load(`${this.assetsPath}fbx/display/fenghuang/model.fbx`, function(model){
 			// 设置模型的位置、旋转和缩放
 			model.position.set(3511, 30, -4335);
 			//model.rotation.y = Math.PI * 1;
-			model.scale.set(10, 10, 10);
+			model.scale.set(1000, 1000, 1000);
 			game.scene.add(model);
 			model.traverse( function ( child ) {
 				if ( child.isMesh ) {
@@ -268,7 +267,7 @@ class Game{
 						child.receiveShadow = true;
 						// 加载模型的贴图
 						if (child.material.map === null) { // 只加载未加载过贴图的材质
-							const texturePath = `${game.assetsPath}fbx/display/gong/texture/${child.name}.png`;
+							const texturePath = `${game.assetsPath}fbx/display/fenghuang/textures/${child.name}.png`;
 							textureLoader.load(texturePath, function(texture) {
 								child.material.map = texture;
 								child.material.needsUpdate = true;
@@ -362,13 +361,12 @@ class Game{
 			game.remoteColliders.push(collider);
 			console.log("模型4号加载成功");
 		})
-		//凤凰
-		//TODO：这个里面没有
-		loader.load(`${this.assetsPath}fbx/display/fenghuang/model.fbx`, function(model){
+		//炉
+		loader.load(`${this.assetsPath}fbx/display/lu/model.fbx`, function(model){
 			// 设置模型的位置、旋转和缩放
 			model.position.set(-5332, 30, 688);
 			//model.rotation.y = Math.PI * 1;
-			model.scale.set(10, 10, 10);
+			model.scale.set(300, 300, 300);
 			game.scene.add(model);
 			model.traverse( function ( child ) {
 				if ( child.isMesh ) {
@@ -380,7 +378,7 @@ class Game{
 						child.receiveShadow = true;
 						// 加载模型的贴图
 						if (child.material.map === null) { // 只加载未加载过贴图的材质
-							const texturePath = `${game.assetsPath}fbx/display/fenghaung/textures/${child.name}.png`;
+							const texturePath = `${game.assetsPath}fbx/display/lu/textures/${child.name}.png`;
 							textureLoader.load(texturePath, function(texture) {
 								child.material.map = texture;
 								child.material.needsUpdate = true;
