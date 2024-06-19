@@ -1,4 +1,102 @@
 //2
+async function getExamID() {
+    const baseUrl = 'http://localhost:8080/exam/add';
+    //const url = `${baseUrl}?examID=${encodeURIComponent(examID)}`;
+
+    try {
+        const response = await fetch(baseUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.text();
+		const examIdMatch = data.match(/Exam ID: (\d+)/)[1];
+        return examIdMatch; // 假设后端返回的数据格式为 { questions: [...] }
+    } catch (error) {
+        console.error('Error fetching exam questions:', error);
+        throw error;
+    }
+}
+
+async function getExamQuestions(examID) {
+    const baseUrl = 'http://localhost:8080/exam/questions';
+    const url = `${baseUrl}?examID=${encodeURIComponent(examID)}`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        return data; // 假设后端返回的数据格式为 { questions: [...] }
+    } catch (error) {
+        console.error('Error fetching exam questions:', error);
+        throw error;
+    }
+}
+
+async function submitExamAnswers(examID, options) {
+    const baseUrl = 'http://localhost:8080/exam/submit';
+    const url = baseUrl;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ examID, options })
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        return data.score; // 假设后端返回的数据格式为 { score: ... }
+    } catch (error) {
+        console.error('Error submitting exam answers:', error);
+        throw error;
+    }
+}
+
+// 点击考官后的处理逻辑
+async function onExaminerClick() {
+     // 点击考官
+        console.log("Clicked on the guide model");
+        this.showChatBox("考官：开始答题！");
+
+        try {
+            // 获取考试ID
+            const examID = await getExamID();
+			this.examID = examID;
+            console.log('Exam ID:', examID);
+
+            // 获取考试题目
+            const questions = await getExamQuestions(examID);
+            console.log('Exam questions:', questions);
+
+			this.showExamBox1(questions);
+
+        } catch (error) {
+            console.error('Error during exam initialization:', error);
+        }
+    
+}
+
 async function getAIAnswer(question) {
     const baseUrl = 'http://localhost:8080/ai';
     const url = `${baseUrl}?question=${encodeURIComponent(question)}`;
@@ -49,6 +147,8 @@ class Game{
 		this.renderer;
 		this.animations = {};
 		this.assetsPath = 'assets/';
+
+		this.examID;
 
 		this.display1;
 		this.display2;
@@ -697,7 +797,7 @@ class Game{
 		const chatContainer = document.createElement('div');
 		chatContainer.id = 'chat-box';
 		chatContainer.style.position = 'absolute';
-		chatContainer.style.bottom = '10px';
+		chatContainer.style.bottom = '40px';
 		chatContainer.style.left = '10px';
 		chatContainer.style.padding = '10px';
 		chatContainer.style.background = 'rgba(0, 0, 0, 0.7)';
@@ -750,6 +850,7 @@ class Game{
 		const form = document.createElement('form');
 		form.id = 'exam-form';
 		form.style.background = 'white';
+
 		questions.forEach((q, i) => {
 			const questionContainer = document.createElement('div');
 			questionContainer.style.marginBottom = '30px';
@@ -803,7 +904,128 @@ class Game{
 		submitButton.style.border = 'none';
 		submitButton.style.borderRadius = '5px';
 		submitButton.style.cursor = 'pointer';
-		submitButton.onclick = () => this.submitExam(questions);
+		submitButton.onclick = () => this.submitExam1(this.examID, questions);
+
+		submitButton.onmouseover = () => submitButton.style.backgroundColor = '#45a049';
+		submitButton.onmouseout = () => submitButton.style.backgroundColor = '#4CAF50';
+
+		form.appendChild(submitButton);
+		examContainer.appendChild(form);
+
+		// 关闭按钮
+		const closeButton = document.createElement('span');
+		closeButton.textContent = '×';
+		closeButton.style.position = 'absolute';
+		closeButton.style.top = '10px';
+		closeButton.style.right = '10px';
+		closeButton.style.cursor = 'pointer';
+		closeButton.style.fontSize = '20px';
+		closeButton.onclick = () => examContainer.remove();
+
+		closeButton.onmouseover = () => closeButton.style.color = 'red';
+		closeButton.onmouseout = () => closeButton.style.color = 'black';
+
+		examContainer.appendChild(closeButton);
+
+		// 检查是否已经有考试对话框存在，如果有则移除
+		const existingExamBox = document.getElementById('exam-box');
+		if (existingExamBox) {
+			existingExamBox.remove();
+		}
+
+		document.body.appendChild(examContainer);
+	}
+	showExamBox1(questions) {
+		// 创建对话框容器
+		const examContainer = document.createElement('div');
+		examContainer.id = 'exam-box';
+		examContainer.style.position = 'absolute';
+		examContainer.style.top = '50%';
+		examContainer.style.left = '50%';
+		examContainer.style.transform = 'translate(-50%, -50%)';  // 垂直和水平居中
+		examContainer.style.padding = '20px';
+		examContainer.style.background = 'rgba(255, 255, 255, 0.95)';
+		examContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+		examContainer.style.color = 'black';
+		examContainer.style.borderRadius = '10px';
+		examContainer.style.boxShadow = '0px 0px 20px rgba(0, 0, 0, 0.5)';
+		examContainer.style.width = '800px';
+		examContainer.style.maxHeight = '80%';
+		examContainer.style.overflowY = 'auto';
+		examContainer.style.zIndex = '1000';
+		examContainer.style.fontSize = '20px';
+
+		// 标题
+		const title = document.createElement('h2');
+		title.textContent = '在线测试';
+		title.style.textAlign = 'center';
+		title.style.marginBottom = '20px';
+		examContainer.appendChild(title);
+
+		// 创建问题表单
+		const form = document.createElement('form');
+		form.id = 'exam-form';
+		form.style.background = 'white';
+
+		//q 是当前的问题对象，i 是当前问题的索引。
+		questions.forEach((q, i) => {
+			const questionContainer = document.createElement('div');
+			questionContainer.style.marginBottom = '30px';
+			questionContainer.style.background = 'white';
+			questionContainer.style.verticalAlign = 'middle';
+
+			const questionLabel = document.createElement('label');
+			questionLabel.textContent = q.text;
+			questionLabel.style.display = 'block';
+			questionLabel.style.marginBottom = '5px';
+			questionLabel.style.fontWeight = 'bold';
+			questionLabel.style.background = 'white';
+			questionLabel.style.backgroundColor = 'white';
+
+			questionContainer.appendChild(questionLabel);
+
+			const options = []
+			options.push(q.option1);
+			options.push(q.option2);
+			options.push(q.option3);
+			options.forEach((option, j) => {
+
+				const optionLabel = document.createElement('label');
+				optionLabel.style.background = 'white';
+				optionLabel.style.display = 'inline-block';
+				optionLabel.style.background = 'white';
+
+				const optionInput = document.createElement('input');
+				optionInput.type = 'radio';
+				optionInput.name = `question-${i}`;
+				optionInput.value = j+1;
+				optionInput.style.display = 'inline-block';
+				optionInput.style.background = 'white';
+				optionInput.style.backgroundColor = 'white';
+				optionInput.style.width = '10%';
+				optionInput.style.marginLeft = '5px';
+
+				optionLabel.appendChild(optionInput);
+				optionLabel.appendChild(document.createTextNode(option));
+				questionContainer.appendChild(optionLabel);
+			});
+
+			form.appendChild(questionContainer);
+		});
+
+		// 提交按钮
+		const submitButton = document.createElement('button');
+		submitButton.type = 'button';
+		submitButton.textContent = '提交答案';
+		submitButton.style.marginTop = '20px';
+		submitButton.style.padding = '10px';
+		submitButton.style.width = '100%';
+		submitButton.style.backgroundColor = '#4CAF50';
+		submitButton.style.color = 'white';
+		submitButton.style.border = 'none';
+		submitButton.style.borderRadius = '5px';
+		submitButton.style.cursor = 'pointer';
+		submitButton.onclick = () => this.submitExam1(this.examID, questions);
 
 		submitButton.onmouseover = () => submitButton.style.backgroundColor = '#45a049';
 		submitButton.onmouseout = () => submitButton.style.backgroundColor = '#4CAF50';
@@ -870,6 +1092,55 @@ class Game{
 			examBox.remove();
 		}
 	}
+
+	submitExam1(examID, questions) {
+		const form = document.getElementById('exam-form');
+		const formData = new FormData(form);
+	
+		let answers = '';
+	
+		questions.forEach((q, i) => {
+			const userAnswer = formData.get(`question-${i}`);
+			answers += `${userAnswer}-`; // 将用户选择的答案拼接成字符串
+		});
+	
+		// 去掉最后一个多余的连接符 "-"
+		answers = answers.slice(0, -1);
+	
+		// 构建提交给后端的数据
+		const data = {
+			examID: this.examID,
+			options: answers
+		};
+	
+		// 向后端发送提交请求
+		fetch('http://localhost:8080/exam/submit', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(data),
+		})
+		.then(response => response.text()) // 将响应转换为文本
+		.then(score => {
+			const truescore =score.match(/Score: (\d+)/)[1];
+			alert(score);
+		})
+		.catch(error => {
+			console.error('提交请求出错：', error);
+			// 处理错误情况
+		})
+		.finally(() => {
+			// 可以选择性地将结果显示在页面的某个区域，或者做其他交互
+	
+			// 移除考试对话框
+			const examBox = document.getElementById('exam-box');
+			if (examBox) {
+				examBox.remove();
+			}
+		});
+	}
+	
 
 
 
@@ -1025,7 +1296,7 @@ class Game{
 		this.remotePlayers.forEach(function(player){ player.update( dt ); });	
 	}
 	
-	onMouseDown(event) {
+	async onMouseDown(event) {
 		if (
 			this.remoteColliders === undefined ||
 			this.remoteColliders.length == 0 ||
@@ -1085,8 +1356,25 @@ class Game{
 
 			if (examinerIntersects.length > 0) { // 点击考官
 				console.log("Clicked on the guide model");
+				// 点击考官
+				console.log("Clicked on the guide model");
 				this.showChatBox("考官：开始答题！");
-				this.showExamBox(this.questions);
+		
+				try {
+					// 获取考试ID
+					const examID = await getExamID();
+					this.examID = examID;
+					console.log('Exam ID:', examID);
+		
+					// 获取考试题目
+					const questions = await getExamQuestions(examID);
+					console.log('Exam questions:', questions);
+		
+					this.showExamBox1(questions);
+		
+				} catch (error) {
+					console.error('Error during exam initialization:', error);
+				}
 				chatWithAI.style.bottom = '0px';
 			} else {
 				console.log("Guide model not detected");
