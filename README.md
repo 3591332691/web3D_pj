@@ -1,8 +1,9 @@
 部署：
 在/3D-multi-player路径下执行：
 
-  npm install express@4.15.2 --save
-
-  npm install socket.io@2.2.0 --save
-
-  node app.js
+  unzip -FF 3D-multi-player.zip
+  cd 3D-multi-player
+  直接 node app.js
+  或者：
+  docker build -t web3d-frontend .
+  docker run -p 2002:2002 web3d-frontend
