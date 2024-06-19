@@ -1,0 +1,21 @@
+{
+  "extends": "@parcel/config-default",
+  "targets": {
+    "*": {
+      "sourceMap": false
+    }
+  },
+  "transformers": {
+    "*/*.js": ["@parcel/transformer-js"],
+    "*.html": ["@parcel/transformer-html"],
+    "*.css": ["@parcel/transformer-css"]
+  },
+  "packagers": {
+    "*.js": ["@parcel/packager-js"],
+    "*.html": ["@parcel/packager-html"],
+    "*.css": ["@parcel/packager-css"]
+  },
+  "resolvers": {
+    "socket.io": "socket.io-client"
+  }
+}

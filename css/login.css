@@ -1,0 +1,239 @@
+/*通用属性*/
+*{
+	transition: all 0.3s; 
+	box-sizing:border-box;
+}
+a{
+	font-family: "微软雅黑", serif;
+	font-size: 14px;
+	line-height: 1.7;
+	color: #666666;
+	margin: 0;
+	text-decoration: none;
+}
+a:hover {
+  	color: chocolate;
+}
+ul,li{
+	margin: 0;
+	list-style-type: none;
+}
+input{
+	outline: none;
+	border: none;
+}
+body{
+	width:100%;
+	margin:0 auto;
+}
+svg{
+	vertical-align: bottom;
+}
+
+/*让.main成为整个页面*/
+.main{
+	width: 100%;  
+	min-height: 100vh;
+	display:flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items:center;
+	padding: 15px;
+	background-image:url(../images/comm/topbar.jpg);
+	background-size: cover;
+}
+
+/*两张表,一张登录div,一张注册div*/
+.maindiv1,.maindiv2{
+	width: 500px;
+	height: 700px;
+	background: #fff;
+	border-radius: 10px;
+	overflow: hidden;
+	padding: 45px;
+}
+.maindiv1{
+	z-index: 1;
+	height: 650px;
+}
+.maindiv2{
+	margin-left: -500px;
+	height: 700px;
+	opacity: 0;
+	z-index: -1;
+}
+form{
+	width: 100%;
+}
+
+/*登录和注册这两个标题*/
+header{
+	display:block;
+	font-family: "微软雅黑", serif;
+	font-size:39px;
+	color:#333333;
+	line-height:1.2;
+	text-align:center;
+	padding-bottom: 49px;
+}
+
+/*用户名和密码两个大div*/
+.user,.pass,.email,.phone{
+	border-bottom: solid 1px lightsteelblue;
+	width:100%;
+	position:relative;
+	margin-bottom: 20px;
+	padding-left: 10px;
+}
+.label{
+	font-family: "微软雅黑", serif;
+	font-size: 14px;
+	color: #333333;
+	line-height: 1.5;
+	padding-left: 7px;
+}
+
+/*用户名div和密码div下的输入框*/
+.user input,.pass input,.email input,.phone input{
+	font-family: "微软雅黑", serif;
+	font-size: 16px;
+	color: #333333;
+	line-height: 1.2;
+	display: block;
+	width: 100%;
+	height: 45px;
+	border: none;
+	padding: 10px 10px 0 50px;
+	margin-bottom: 20px;
+}
+.user input{
+	background-size: 30px;
+	background: no-repeat 5px 15px;
+}
+.email input{
+	background-size: 30px;
+	background:  no-repeat 5px 15px;
+}
+.phone input{
+	background-size: 30px;
+	background:  no-repeat 5px 15px;
+}
+.pass input{
+	background-size: 30px;
+	background: no-repeat 5px 15px;
+}
+
+/*输入框下面的动态线*/
+.focus-input{
+	background: #7f7f7f;
+	position: absolute;
+	bottom: 0;
+	width: 0;
+	height: 2px;
+	left: 50%;
+}
+.user input:focus+.focus-input,.pass input:focus+.focus-input.email input:focus+.focus-input,.phone input:focus+.focus-input{
+	width: 100%;
+	left: 0;
+}
+
+/*验证时出现的提示文字*/
+.yanzhengtxt{
+	text-align:  center;
+	font-size: 17px;
+	height: 1px;
+}
+.maindiv1 .yanzhengtxt{
+	margin-bottom: 18px;
+}
+.maindiv2 .yanzhengtxt {
+	margin-top: 0;
+}
+
+/*登录div和注册div*/
+.login,.reg{
+	width:100%;
+	display:block;
+	position:relative;
+	z-index:1;
+	border-radius:25px;
+	overflow:hidden;
+	margin:0 auto;
+	box-shadow:0 5px 30px 0 rgba(0, 0, 0, 0.5);
+}
+.login{
+	bottom: -20px;
+}
+.reg{
+	margin-top: 30px;
+}
+
+/*登录div和注册div里面的一个div，用于存放背景*/
+.login-bg-btn,.reg-bg-btn{
+	position:absolute;
+	left:-100%;
+    z-index:-1;
+    width:300%;
+    height:100%;
+    background: url(../images/comm/topbar.jpg);
+}
+
+/*与.login-bg-btn和.reg-bg-btn同级的按钮，颜色设置为透明，实现按钮滚动的动态效果*/
+.login-btn,.reg-btn{
+	font-family: "微软雅黑", serif;
+    font-size:16px;
+    color:#fff;
+    width:100%;
+    height:50px;
+    text-align: center;
+    background: transparent;
+}
+.login-btn:hover,.reg-btn:hover{
+	cursor: pointer;
+}
+.login:hover .login-bg-btn,.reg:hover .reg-bg-btn{
+  left:-50%;
+}
+.zhuche{
+	font-family: "微软雅黑", serif;
+	font-size: 14px;
+	line-height: 1.5;
+	color: #333333;
+	padding-top: 25px;
+	text-align: center;
+	margin-top: 30px;
+}
+.return{
+	text-align: right;
+	margin-top: 40px;
+}
+.maindiv2 .return{
+	margin-top:20px;
+}
+
+
+/*自定义动画，实现翻转*/
+@keyframes donghua1{
+	from{
+		transform:rotateY(0deg);
+	}
+	to{
+		transform:rotateY(90deg);
+	}
+}
+@keyframes donghua2{
+	from{
+		transform: rotateY(-90deg);
+	}
+	to{
+		transform: rotate(0deg);
+	}
+}
+
+/*媒体查询*/
+@media (max-width: 576px) {
+  .main>div{
+    padding-left:15px;
+    padding-right:15px;
+  }
+}
