@@ -78,7 +78,7 @@ header{
 }
 
 /*用户名和密码两个大div*/
-.user,.pass,.email{
+.user,.pass,.email,.phone{
 	border-bottom: solid 1px lightsteelblue;
 	width:100%;
 	position:relative;
@@ -94,7 +94,7 @@ header{
 }
 
 /*用户名div和密码div下的输入框*/
-.user input,.pass input,.email input{
+.user input,.pass input,.email input,.phone input{
 	font-family: "微软雅黑", serif;
 	font-size: 16px;
 	color: #333333;
@@ -114,6 +114,10 @@ header{
 	background-size: 30px;
 	background:  no-repeat 5px 15px;
 }
+.phone input{
+	background-size: 30px;
+	background:  no-repeat 5px 15px;
+}
 .pass input{
 	background-size: 30px;
 	background: no-repeat 5px 15px;
@@ -128,7 +132,7 @@ header{
 	height: 2px;
 	left: 50%;
 }
-.user input:focus+.focus-input,.pass input:focus+.focus-input.email input:focus+.focus-input{
+.user input:focus+.focus-input,.pass input:focus+.focus-input.email input:focus+.focus-input,.phone input:focus+.focus-input{
 	width: 100%;
 	left: 0;
 }

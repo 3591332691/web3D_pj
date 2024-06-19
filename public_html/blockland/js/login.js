@@ -107,46 +107,70 @@ function regemail() {
 	regtxt.innerHTML = str;
 	return a === 1;
 }
+//phone
+function regphone() {
+	let a = 0;
+	let str = " ";
+	let regtxt = document.getElementsByClassName("yanzhengtxt")[1];
+	let phone = document.getElementsByName("phone")[0].value;
+	// 使用正则表达式验证邮箱格式
+	if(phone==="")
+	{
+		// 电话号码不正确
+		str = "电话号码请勿为空";
+		regtxt.innerHTML = str;
+	}
+	else{
+		// 邮箱格式正确
+		a = 1;
+	}
+	regtxt.innerHTML = str;
+	return a === 1;
+}
 
 //点击登录进行再次验证
-function login(event) {
+async function login(event) {
 	event.preventDefault(); // 防止表单提交
-	
-        setTimeout('test()', 10);
-    
+
+	setTimeout('test()', 10);
+
 	if (loginuser() && loginpass()) {
 		console.log("1");//test
 		let username = document.getElementsByName("username")[0].value;
-		let email = document.getElementsByName("email")[0].value;
 		let pass = document.getElementsByName("pass")[0].value;
-		let data = {username: username, email:email,password: pass};
-		jQuery.ajax({
-			url: "../php/login.php",
-			type: "POST",
-			data: JSON.stringify(data),
-			dataType: "json",
-			success: function(response) {
-			  if (response.status == "success") {
+		let data = {username: username, password: pass};
+		const baseUrl = 'http://localhost:8080/user/login';
+		try {
+			const response = await fetch(baseUrl, {
+				method: 'POST', // 使用 POST 方法发送数据
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(data) // 将 data 对象转换为 JSON 字符串作为请求主体
+			});
+
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			const responseData = await response.text();
+			if (response.status === 200) {
 				// 登录成功
-				alert("登陆成功");
-				console.log("login success");
+				alert("登录成功");
+				console.log(responseData);
+				const userIdMatch = responseData.match(/User ID: (\d+)/)[1];
 				document.cookie = "login=true; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/";
-				
-				document.cookie = "userId=" + response.userId + "; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/";//userId de cookie
+				document.cookie = "userId=" + userIdMatch + "; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/";//userId de cookie
 				window.location.href = "../index.html";
-			  } else {
+			} else {
 				// 登录失败
 				console.log("login failed");
 				alert("用户名不存在或密码错误！");
-			  }
-			},
-			error: function(xhr, status, error) {
-			  // 请求失败
-			  console.log("请求失败：" + error);
-			  alert("登录失败，请稍后再试");
 			}
-		  });
-	  }
+		} catch (error) {
+			console.error('Error fetching data:', error);
+			throw error;
+		}
+	}
 }
 
 //翻转，两个div，一个div翻成一条线的时候，也就是90度的时候，然后把这个div隐藏，然后另一个div原本是隐藏的，把它显示出来，从90度开始翻出来
@@ -182,60 +206,53 @@ function fanzhuan(i) {
 }
 
 //点击注册后进行验证并翻转，并加入注册成功的提示信息，以及自动填充
-function reg() {
-	if (reguser() && regpass1() && regpass2()) {
-		/*fanzhuan(2);
+async function reg() {
+	if (reguser() && regpass1() && regemail()&&regphone()) {
 		let username = document.getElementsByName("username")[1].value;
 		let pass = document.getElementsByName("pass")[1].value;
-		setTimeout(function () {
-			document.getElementsByName("username")[0].value = username;
-			document.getElementsByName("pass")[0].value = pass;
-			let longintxt = document.getElementsByClassName("yanzhengtxt")[0];
-			longintxt.innerHTML = "<p style='font-size:13px;font-family: 微软雅黑;color: black;'>注册成功，已为你自动填充</p>";
-		}, 800);*/
-		let username = document.getElementsByName("username")[1].value;
-		let pass = document.getElementsByName("pass")[1].value;
-		let data = {username: username, password: pass};
+		let phone = document.getElementsByName("phone")[0].value;
+		let email = document.getElementsByName("email")[0].value;
+		let data = {username: username, email: email, phone: phone,password: pass};
 		console.log("hi");
 		let temp = 0;
-		jQuery.ajax({
-			url: "../php/register.php",
-			type: "POST",
-			data: JSON.stringify(data),
-			dataType: "json",
-			
-			success: function(response) {
-			  // 处理注册成功后的操作
-			  console.log("hi");//test
-			  console.log(response);//test
-			  if (response.status == "success") {
+		const baseUrl = 'http://localhost:8080/user/register';
+		try {
+			const response = await fetch(baseUrl, {
+				method: 'POST', // 使用 POST 方法发送数据
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(data) // 将 data 对象转换为 JSON 字符串作为请求主体
+			});
+
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			const responseData = await response.json();
+			if (response.status === "success") {
 				// 处理注册成功后的操作
 				temp = 1;
 				console.log("注册成功！");
 				alert("注册成功！");
 				console.log(temp);
 				fanzhuan(2);
-
 				setTimeout(function () {
 					document.getElementsByName("username")[0].value = username;
 					document.getElementsByName("pass")[0].value = pass;
 					let longintxt = document.getElementsByClassName("yanzhengtxt")[0];
 					longintxt.innerHTML = "<p style='font-size:13px;font-family: 微软雅黑,serif;color: black;'>注册成功，已为你自动填充</p>";
 				}, 800);
-			  } else {
+			} else {
 				// 处理注册失败后的操作
 				console.log("注册失败：" + response.message);
 				alert(response.message);
-				return false;
-			  }
-			},
-			error: function(xhr, status, error) {
-			  // 处理注册失败后的操作
-				console.log("请求失败：" + error); // 打印错误信息
+				alert(responseData);
 				return false;
 			}
-		  });
-
+		} catch (error) {
+			console.error('Error fetching data:', error);
+			throw error;
+		}
 	}
 	return false;
 }

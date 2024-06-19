@@ -1,5 +1,4 @@
 //2
-//TODO:修改这里成为调用后端的
 async function getAIAnswer(question) {
     const baseUrl = 'http://localhost:8080/ai';
     const url = `${baseUrl}?question=${encodeURIComponent(question)}`;
@@ -25,6 +24,7 @@ async function getAIAnswer(question) {
 }
 
 class Game{
+	userid ;
 	constructor(){
 		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -37,7 +37,7 @@ class Game{
 			GAMEOVER: Symbol("gameover")
 		});
 		this.mode = this.modes.NONE;
-		
+		this.userid;
 		this.container;
 		this.player;
 		this.guide; // 跟随用户的导游
@@ -151,6 +151,23 @@ class Game{
 				this.loadPlayerModel();
 			}
 		}
+		//这里是初始化userID,如果没有，游客登陆，那么就是空
+		getUserID(){
+			const game = this;
+			const name = "userId" + "=";
+			const decodedCookie = decodeURIComponent(document.cookie);
+			const cookieArray = decodedCookie.split(';');
+
+			for (let i = 0; i < cookieArray.length; i++) {
+				let cookie = cookieArray[i].trim();
+				if (cookie.indexOf(name) === 0) {
+					game.userid =cookie.substring(name.length, cookie.length);
+					return 0;
+				}
+			}
+			game.userid = "";
+			return 0;
+		}
 		
 		loadPlayerModel() {
 			const player = this.player;
@@ -260,7 +277,7 @@ class Game{
 		// model
 		const loader = new THREE.FBXLoader();
 		const game = this;
-		
+		this.getUserID();
 		//this.player = new PlayerLocal(this);
 		this.createPlayer(); // 创建玩家
 		
