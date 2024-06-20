@@ -498,7 +498,7 @@ class Game{
 		//加载铜马
 		loader.load(`${this.assetsPath}fbx/display/tongma/tongma.fbx`, function(model){
 			// 设置模型的位置、旋转和缩放
-			model.position.set(5185, 30, -2123);
+			model.position.set(5185, 150, -2123);
 			//model.rotation.y = Math.PI * 1;
 			model.scale.set(6, 6, 6);
 			game.display1 = model;
@@ -536,7 +536,7 @@ class Game{
 		//加载凤凰
 		loader.load(`${this.assetsPath}fbx/display/fenghuang/model.fbx`, function(model){
 			// 设置模型的位置、旋转和缩放
-			model.position.set(3511, 30, -4335);
+			model.position.set(3511, 350, -4335);
 			//model.rotation.y = Math.PI * 1;
 			model.scale.set(1000, 1000, 1000);
 			game.display2 = model;
@@ -574,7 +574,7 @@ class Game{
 		//加载方鼎
 		loader.load(`${this.assetsPath}fbx/display/fangding/fangding.fbx`, function(model){
 			// 设置模型的位置、旋转和缩放
-			model.position.set(-1754, 30, -5708);
+			model.position.set(-1754, 200, -5708);
 			//model.rotation.y = Math.PI * 1;
 			model.scale.set(10, 10, 10);
 			game.display3 = model;
@@ -612,7 +612,7 @@ class Game{
 		//加载升鼎
 		loader.load(`${this.assetsPath}fbx/display/ding/ding.fbx`, function(model){
 			// 设置模型的位置、旋转和缩放
-			model.position.set(-4972, 30, -2622);
+			model.position.set(-4972, 200, -2622);
 			//model.rotation.y = Math.PI * 1;
 			model.scale.set(10, 10, 10);
 			game.display4 = model;
@@ -650,7 +650,7 @@ class Game{
 		//炉
 		loader.load(`${this.assetsPath}fbx/display/lu/model.fbx`, function(model){
 			// 设置模型的位置、旋转和缩放
-			model.position.set(-5332, 30, 688);
+			model.position.set(-5332, 450, 688);
 			//model.rotation.y = Math.PI * 1;
 			model.scale.set(300, 300, 300);
 			game.display5 = model;
@@ -686,7 +686,6 @@ class Game{
 			console.log("模型5号加载成功");
 		})
 		//加载青花瓷
-		//TODO：这个没有材质
 		loader.load(`${this.assetsPath}fbx/display/qinghuaci/ping.fbx`, function(model){
 			// 设置模型的位置、旋转和缩放
 			model.position.set(-2031, 30, 5743);
@@ -704,7 +703,7 @@ class Game{
 						child.receiveShadow = true;
 						// 加载模型的贴图
 						if (child.material.map === null) { // 只加载未加载过贴图的材质
-							const texturePath = `${game.assetsPath}fbx/display/qinghuaci/${child.name}.png`;
+							const texturePath = `${game.assetsPath}fbx/display/qinghuaci/ping_lambert1_BaseColor.jpg`;
 							textureLoader.load(texturePath, function(texture) {
 								child.material.map = texture;
 								child.material.needsUpdate = true;
@@ -749,7 +748,7 @@ class Game{
 		// 加载NPC模型
 		loader.load(`${this.assetsPath}fbx/npc/BB8.FBX`, function(model) {
 			// 设置模型的位置、旋转和缩放
-			model.position.set(2500, 100, 500);
+			model.position.set(2500, 300, 500);
 			model.scale.set(3, 3, 3);
 
 			game.examiner = model;
